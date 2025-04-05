@@ -9,16 +9,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+      /* Styles remain the same as previous index.html */
       /* Custom scrollbar */
       ::-webkit-scrollbar { width: 8px; height: 8px; }
       ::-webkit-scrollbar-track { background: #1f2937; } /* gray-800 */
       ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; } /* gray-600 */
       ::-webkit-scrollbar-thumb:hover { background: #6b7280; } /* gray-500 */
-
-      /* Search Input Styling */
       #search-input { width: 100%; }
-
-      /* Tooltip Styling */
       .tooltip { position: relative; display: inline-block; }
       .tooltip .tooltiptext {
         visibility: hidden; width: 250px; background-color: #1f2937; color: #fff; text-align: left;
@@ -27,26 +24,18 @@
         box-shadow: 0 2px 10px rgba(0,0,0,0.5); pointer-events: none;
       }
       .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
-
-      /* Loading Spinner */
       .spinner {
         border: 4px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: #e50914;
-        width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 0 auto; /* Centered */
+        width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 0 auto;
       }
       @keyframes spin { to { transform: rotate(360deg); } }
       .loading-placeholder .spinner { display: inline-block; vertical-align: middle; margin-right: 8px;}
-
-      /* Non-clickable card style */
       .non-clickable { opacity: 0.6; cursor: default !important; }
       .non-clickable .group-hover\:scale-110 { transform: scale(1) !important; }
       .non-clickable .group-hover\:opacity-100 { opacity: 0 !important; }
-
-      /* Ensure group class is present for hover effects */
       .group {}
-
     </style>
     <script>
-        // Configure Tailwind
         tailwind.config = {
             darkMode: 'class',
             theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } }
@@ -84,7 +73,7 @@
         </section>
 
         <div id="latest-sections">
-            <section id="movies" class="mb-12">
+             <section id="movies" class="mb-12">
                 <h2 class="text-2xl font-semibold mb-4 border-l-4 border-red-600 pl-3">Popular Movies</h2>
                 <div id="movies-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
                     <div class="loading-placeholder text-center col-span-full p-8 text-gray-400"><div class="spinner"></div>Loading movies...</div>
@@ -116,9 +105,8 @@
 
     <script>
         // --- START CONFIGURATION ---
-        const TMDB_API_KEY = '1caf3d8d7639732de72d054a395eba76'; // Replace with your TMDB key
-        const EMBED_API_BASE_URL = 'https://multiembed.mov/'; // Standard player
-        // const EMBED_API_BASE_URL = 'https://multiembed.mov/directstream.php'; // Optional: VIP player
+        const TMDB_API_KEY = '1caf3d8d7639732de72d054a395eba76';
+        // EMBED_API_BASE_URL is no longer needed here, will be used in player.html
         // --- END CONFIGURATION ---
 
         // --- Constants ---
@@ -127,7 +115,7 @@
         const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
         const PLACEHOLDER_IMAGE_URL = 'https://placehold.co/300x450/1f2937/ffffff?text=No+Image';
 
-        // --- DOM Elements ---
+        // --- DOM Elements --- (remain the same)
         const moviesGrid = document.getElementById('movies-grid');
         const tvShowsGrid = document.getElementById('tvshows-grid');
         const episodesGrid = document.getElementById('episodes-grid');
@@ -137,7 +125,6 @@
         const searchForm = document.getElementById('search-form');
         const searchInput = document.getElementById('search-input');
         const searchQueryDisplay = document.getElementById('search-query-display');
-        // Removed modal elements
         const loadMoreMoviesBtn = document.getElementById('load-more-movies');
         const loadMoreTvShowsBtn = document.getElementById('load-more-tvshows');
         const loadMoreEpisodesBtn = document.getElementById('load-more-episodes');
@@ -146,7 +133,6 @@
 
         // --- State ---
         let isLoading = { movies: false, tvshows: false, episodes: false, search: false };
-        // Removed modal state variables
 
         // --- Helper Functions --- (checkApiKey, fetchVidsrcData, fetchTMDBData remain the same)
         function checkApiKey() { /* ... */ }
@@ -159,23 +145,22 @@
 
         /**
          * Creates an HTML card element. Adds click listener to navigate to player page.
+         * Stores necessary data in dataset for navigation.
          * @param {object} item - The item data (from TMDB API or Vidsrc API).
          * @param {string} type - 'movie', 'tv', or 'episode'.
          * @returns {HTMLElement} - The created card element.
          */
         function createCard(item, type) {
             const card = document.createElement('div');
-            card.className = 'bg-gray-800 rounded-lg overflow-hidden shadow-lg transform transition duration-300 ease-in-out flex flex-col group'; // Ensure group class is present
+            card.className = 'bg-gray-800 rounded-lg overflow-hidden shadow-lg transform transition duration-300 ease-in-out flex flex-col group';
             let playId = null, playIdType = null, playType = type;
             let canPlay = false;
-            let dataset = {}; // Store data needed for navigation
+            let dataset = {}; // Data to pass to player page
 
             if (type === 'movie' || type === 'tv') {
-                playId = item.id; playIdType = 'tmdb';
+                playId = item.id; playIdType = 'tmdb'; // Assume TMDB ID from popular lists/search
                 if (playId) {
                     dataset.id = playId; dataset.idtype = playIdType; dataset.type = playType;
-                    // Store title for player page
-                    dataset.title = item.title || item.name || '';
                     canPlay = true;
                 }
             } else if (type === 'episode') {
@@ -184,13 +169,13 @@
                 if (playId && playIdType && item.season != null && item.episode != null) {
                     dataset.type = playType; dataset.season = item.season; dataset.episode = item.episode;
                     dataset.showid = playId; dataset.showidtype = playIdType;
-                    // Store title for player page
-                    dataset.title = `${item.show_title || 'TV Show'} S${item.season} E${item.episode}`;
+                    // Pass the main ID/type as the show's ID/type for episodes
+                    dataset.id = playId; dataset.idtype = playIdType;
                     canPlay = true;
                 }
             }
 
-            // --- Determine Display Info --- (Same as before)
+            // --- Display Info --- (Same as before)
             let title = item.title || item.name || 'Untitled';
             let posterUrl = PLACEHOLDER_IMAGE_URL;
             let rating = (item.vote_average ?? 0) > 0 ? item.vote_average.toFixed(1) : null;
@@ -221,7 +206,7 @@
 
             // --- Add Click Listener to Navigate ---
             if (canPlay) {
-                 // Add temporary dataset for the click handler
+                 // Attach data needed for navigation directly to the element for the handler
                  Object.keys(dataset).forEach(key => card.dataset[key] = dataset[key]);
                  card.addEventListener('click', () => navigateToPlayer(card.dataset));
             } else {
@@ -232,7 +217,7 @@
 
 
         /**
-         * Loads and displays items. (No changes needed here)
+         * Loads and displays items. (No changes needed)
          */
         async function loadItems(listType, gridElement, page = 1, append = false) {
            let apiEndpoint = '', dataSource = '', itemType = '', stateKey = '';
@@ -258,60 +243,40 @@
 
 
         /**
-         * Executes a search. (No changes needed here)
+         * Executes a search. (No changes needed)
          */
         async function performSearch(query) { /* ... */ }
         performSearch = async function(query) { if (isLoading.search || !query) return; isLoading.search = true; console.log(`Performing search for: ${query}`); latestSections.classList.add('hidden'); searchResultsSection.classList.remove('hidden'); searchQueryDisplay.textContent = query; searchResultsGrid.innerHTML = '<div class="loading-placeholder text-center col-span-full p-8 text-gray-400"><div class="spinner"></div>Searching...</div>'; const searchData = await fetchTMDBData('/search/multi', { query: query, include_adult: false }); const loadingPlaceholder = searchResultsGrid.querySelector('.loading-placeholder'); if (searchData && searchData.results) { if (loadingPlaceholder) loadingPlaceholder.style.display = 'none'; searchResultsGrid.innerHTML = ''; let foundItems = 0; searchData.results.forEach(item => { if ((item.media_type === 'movie' || item.media_type === 'tv')) { const card = createCard(item, item.media_type); searchResultsGrid.appendChild(card); foundItems++; } }); if (foundItems === 0) searchResultsGrid.innerHTML = '<div class="loading-placeholder text-center col-span-full p-8 text-gray-400">No relevant movies or TV shows found.</div>'; } else { searchResultsGrid.innerHTML = '<div class="loading-placeholder text-center col-span-full p-8 text-gray-400">Search failed or no results found.</div>'; } isLoading.search = false; };
 
-        /** Shows the main sections, hides search. (No changes needed here) */
+        /** Shows the main sections, hides search. (No changes needed) */
         function showLatestSections() { /* ... */ }
         showLatestSections = function() { searchResultsSection.classList.add('hidden'); latestSections.classList.remove('hidden'); searchInput.value = ''; };
 
 
         /**
-         * Constructs the appropriate player URL and navigates to player.html.
+         * Constructs URL parameters and navigates to player.html.
          * @param {object} dataset - The dataset from the clicked card element.
          */
         function navigateToPlayer(dataset) {
-            const { type, id, idtype, season, episode, showid, showidtype, title } = dataset;
+            const { type, id, idtype, season, episode, showid, showidtype } = dataset;
             console.log("Navigating to player with dataset:", dataset);
 
-            let playerPageUrl = 'player.html'; // The target player page
+            const playerPageUrl = 'player.html'; // The target player page
             const params = new URLSearchParams();
 
             try {
-                if (type === 'movie') {
-                    // Construct embed URL here and pass it
-                    let embedUrl = '';
-                    if (idtype === 'tmdb') {
-                        embedUrl = `${EMBED_API_BASE_URL}?video_id=${id}&tmdb=1`;
-                    } else { // Assume imdb
-                        embedUrl = `${EMBED_API_BASE_URL}?video_id=${id}`;
-                    }
-                    params.append('embedUrl', embedUrl);
-                    params.append('title', title || `Movie (${idtype.toUpperCase()}: ${id})`);
+                // Always pass type, id, and idtype
+                params.append('type', type);
+                params.append('id', id);
+                params.append('idtype', idtype);
 
-                } else if (type === 'episode') {
-                    // Construct embed URL here and pass it
-                    let embedUrl = '';
-                    if (showidtype === 'tmdb') {
-                        embedUrl = `${EMBED_API_BASE_URL}?video_id=${showid}&tmdb=1&s=${season}&e=${episode}`;
-                    } else { // Assume imdb
-                        embedUrl = `${EMBED_API_BASE_URL}?video_id=${showid}&s=${season}&e=${episode}`;
-                    }
-                    params.append('embedUrl', embedUrl);
-                    params.append('title', title || `Episode (${showidtype.toUpperCase()}: ${showid}) - S${season} E${episode}`);
-
-                } else if (type === 'tv') {
-                    // Pass TV show ID and type to player page for selection
-                    params.append('type', 'tv');
-                    params.append('id', id);
-                    params.append('idtype', idtype); // Should always be 'tmdb' from our lists
-                    // Title can optionally be passed or fetched again on player page
-                    // params.append('title', title || `TV Show (${idtype.toUpperCase()}: ${id})`);
-
-                } else {
-                    throw new Error(`Unknown item type: ${type}`);
+                // Add episode specific params if type is 'episode'
+                if (type === 'episode') {
+                    params.append('season', season);
+                    params.append('episode', episode);
+                    // Pass show id/type explicitly if needed by player page for context
+                    params.append('showid', showid);
+                    params.append('showidtype', showidtype);
                 }
 
                 // Navigate to player page with parameters
@@ -323,9 +288,9 @@
             }
         }
 
-        // --- Event Listeners --- (No changes needed for modal listeners as they are removed)
+        // --- Event Listeners --- (No modal listeners)
         searchForm.addEventListener('submit', (event) => { event.preventDefault(); const query = searchInput.value.trim(); if (query) performSearch(query); else showLatestSections(); });
-        homeLink.addEventListener('click', (event) => { event.preventDefault(); window.location.href = 'index.html'; }); // Go to index.html
+        homeLink.addEventListener('click', (event) => { event.preventDefault(); window.location.href = 'index.html'; });
         navLinks.forEach(link => { link.addEventListener('click', (event) => { const targetId = link.getAttribute('href'); if (targetId && targetId.startsWith('#')) { showLatestSections(); /* Allow default scroll */ } }); });
         loadMoreMoviesBtn.addEventListener('click', () => loadItems('movies', moviesGrid, parseInt(loadMoreMoviesBtn.dataset.page, 10), true));
         loadMoreTvShowsBtn.addEventListener('click', () => loadItems('tvshows', tvShowsGrid, parseInt(loadMoreTvShowsBtn.dataset.page, 10), true));
